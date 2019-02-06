@@ -1,0 +1,155 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <style>body{
+  background-color: #21252940;
+}
+
+.dropdown-content{
+  
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+.dtn2{
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-content{
+  display: none;
+}
+
+.dropdown2{
+  position: relative;
+}
+
+.buttondrop{
+  margin-top: 15px;
+}
+
+i{
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  margin-top: 4px;
+    float: right;
+}
+
+.downarrow{
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+.present{
+  width: 200px;
+  float: left;
+}
+.absence{
+  width: 200px;
+  float: left;
+}</style>
+</head>
+<body>
+<div class="jumbotron">
+    <h1>All CLASS</h1>      
+    <p>This page tell you all subjects attendance</p>
+  </div>
+    
+    <div class="container">
+    	<div id="something"></div>
+    </div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+var socket = io();
+
+// get all subjects from database
+socket.on('connect',function(){
+  socket.on('allSub',function(some){
+  for (var i = 0; i < some.length; i++) {
+    createDropdown(some[i]);
+    console.log(i)
+  }
+ });
+  console.log("worked")
+});
+
+ //function for dropdown taking value of button
+function dropdown(sub){
+  var array = sub.split(" ",2);
+  if (array[1] == '0') {
+    document.getElementById(array[0]).style.display = "block";
+    document.getElementById(array[0]+'0').value = array[0] + ' 1';
+  }
+  else{
+    
+    document.getElementById(array[0]).style.display = "none";
+    document.getElementById(array[0]+'0').value = array[0] + ' 0'; 
+  }
+      
+
+
+}
+
+//function for creating dropdown with all the value
+function createDropdown(sub){
+
+  var calculatedPercentage = (sub.present)/(sub.present+sub.absence)*100;
+  var something = document.getElementById('something');
+     var dropdown2 = document.createElement('DIV');
+         dropdown2.className = 'buttondrop'
+     var dropbutton = document.createElement('BUTTON');
+      if(calculatedPercentage<75){
+         dropbutton.setAttribute('class','btn btn-danger dtn2');
+         }
+        else if(calculatedPercentage==75){
+          dropbutton.setAttribute('class','btn btn-warning dtn2');
+        }else{
+          dropbutton.setAttribute('class','btn btn-success dtn2');
+        }
+         dropbutton.setAttribute('type','button');
+         dropbutton.id = sub.subjectName+'0';
+         dropbutton.setAttribute('value',sub.subjectName+' 0');
+         dropbutton.setAttribute('onclick','dropdown(value)');
+     var i = document.createElement('I');
+         i.className = 'downarrow'
+     dropbutton.appendChild(document.createTextNode(sub.subjectName));
+     dropbutton.appendChild(i);
+     dropdown2.appendChild(dropbutton); 
+
+     var pSub = document.createElement('P');
+         pSub.className = 'pSub';
+     var present = document.createElement('DIV');
+         present.className = "present";
+     var Absence = document.createElement('DIV');
+         Absence.className = 'Absence';
+     var percentage = document.createElement('DIV');
+         percentage.className = 'percentage';
+
+     var div = document.createElement('DIV');
+         div.className = "dropdown-content";
+         div.id = sub.subjectName;
+     pSub.appendChild(document.createTextNode("Subject: "+ sub.subjectName));
+     present.appendChild(document.createTextNode("present: "+ sub.present));
+     Absence.appendChild(document.createTextNode("Absence: "+ sub.absence));
+     percentage.appendChild(document.createTextNode("percentage: "+ calculatedPercentage + '%'));
+     div.appendChild(pSub)
+     div.appendChild(present)
+     div.appendChild(Absence)
+     div.appendChild(percentage)
+     dropdown2.appendChild(div);
+     something.appendChild(dropdown2);
+
+}
+
+</script>
+</body>
+</html>
